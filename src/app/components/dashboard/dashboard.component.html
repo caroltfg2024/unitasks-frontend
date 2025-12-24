@@ -1,0 +1,29 @@
+<div class="main-dashboard" [class.dark-mode]="themeService.isDarkMode()">
+    <!-- Sidebar Izquierda -->
+    <aside class="sidebar-viz">
+        <app-hello></app-hello>
+
+        <!-- Leaderboard Button -->
+        <button class="leaderboard-btn-top" (click)="goToLeaderboard()">
+            <span class="trophy-icon">🏆</span>
+            Ver Clasificación
+        </button>
+
+        <app-tags></app-tags>
+
+        <!-- Logout Button -->
+        <div class="logout-section">
+            <button class="logout-btn" (click)="logout()">
+                <span class="logout-icon">🚪</span>
+                Cerrar Sesión
+            </button>
+        </div>
+    </aside>
+
+    <!-- Área Principal -->
+    <main class="content-viz">
+        <div class="white-board">
+            <app-task-list></app-task-list>
+        </div>
+    </main>
+</div>

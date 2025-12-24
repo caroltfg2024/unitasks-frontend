@@ -1,0 +1,126 @@
+.hello-container {
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    /* Quitamos el degradado de fuera */
+    display: block;
+}
+
+.hello-card {
+    background: transparent;
+    padding: 1.5rem 1rem;
+    width: 100%;
+    text-align: left;
+    /* Align left for sidebar look */
+    animation: slideUpFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    transform: translateY(20px);
+    opacity: 1;
+    border: none;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(34, 197, 94, 0.15);
+    /* Translucent Green */
+    color: #4ade80;
+    /* Brighter Green */
+    padding: 0.4rem 0.85rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border: 1px solid rgba(74, 222, 128, 0.2);
+}
+
+.status-dot {
+    width: 6px;
+    height: 6px;
+    background-color: #22c55e;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+    animation: pulse-green 2s infinite;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    margin-bottom: 1rem;
+}
+
+.user-avatar {
+    font-size: 1.5rem;
+    background: rgba(255, 255, 255, 0.2);
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.user-fullname {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: white;
+    flex: 1;
+}
+
+h1 {
+    font-size: 1.75rem;
+    font-weight: 800;
+    margin: 0.5rem 0 1rem 0;
+    line-height: 1.1;
+    color: #111827;
+}
+
+.gradient-text {
+    background: linear-gradient(to right, #4f46e5, #0891b2);
+    /* Darker Indigo to Cyan for clarity */
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: block;
+    margin-top: 0.25rem;
+}
+
+.message-body {
+    font-size: 0.9rem;
+    color: #475569;
+    /* Slate-600 for contrast */
+    line-height: 1.6;
+    margin: 0;
+}
+
+.user-name-highlight {
+    color: #0f172a;
+    /* Slate-900 */
+    font-weight: 700;
+}
+
+@keyframes slideUpFade {
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes pulse-green {
+    0% {
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4);
+    }
+
+    70% {
+        box-shadow: 0 0 0 6px rgba(34, 197, 94, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+    }
+}

@@ -1,0 +1,15 @@
+<div class="tags-container">
+    <ng-container *ngFor="let tag of tags">
+        <div *ngIf="!tag.isDivider" class="tag-item" [class.active]="tag.status === currentFilter"
+            (click)="selectFilter(tag.status)">
+            <div class="tag-label-group">
+                <span class="tag-dot" [style.backgroundColor]="tag.color"></span>
+                <span class="tag-name">{{ tag.name }}</span>
+            </div>
+            <span class="tag-count">{{ tag.count }}</span>
+        </div>
+        <div *ngIf="tag.isDivider" class="tag-divider">
+            <span>{{ tag.name }}</span>
+        </div>
+    </ng-container>
+</div>

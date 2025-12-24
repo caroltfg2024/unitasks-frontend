@@ -1,0 +1,316 @@
+<div class="task-list-container">
+    <!-- Action Success Toast -->
+    <div class="action-toast" *ngIf="showToast" [class.show]="showToast" [ngClass]="'toast-' + toastType">
+        <div class="toast-content">
+            <span class="toast-icon">
+                {{ toastType === 'delete' ? '🗑️' : (toastType === 'create' ? '➕' : '✏️') }}
+            </span>
+            <span class="toast-message">
+                {{ toastAction }} <span class="toast-title-text">"{{ toastTitle }}"</span>
+            </span>
+        </div>
+        <div class="toast-progress"></div>
+    </div>
+
+    <div class="list-header-actions">
+        <div class="header-title-group">
+            <h2>Mis Tareas</h2>
+            <button class="add-task-header-btn" (click)="openAddModal()">
+                <span class="plus-icon">+</span> Nueva Tarea
+            </button>
+        </div>
+        <div class="view-toggles">
+            <button class="view-btn" [class.active]="viewMode === 'grid'" (click)="viewMode = 'grid'"
+                title="Vista Cuadrícula">
+                <span class="grid-icon">田</span>
+            </button>
+            <button class="view-btn" [class.active]="viewMode === 'list'" (click)="viewMode = 'list'"
+                title="Vista Lista">
+                <span class="list-icon">≡</span>
+            </button>
+            <button class="view-btn" [class.active]="viewMode === 'timeline'" (click)="viewMode = 'timeline'"
+                title="Línea de Tiempo">
+                <span class="timeline-icon">⏳</span>
+            </button>
+            <button class="view-btn" [class.active]="viewMode === 'calendar'" (click)="viewMode = 'calendar'"
+                title="Vista Calendario Semanal">
+                <span class="calendar-icon">📅</span>
+            </button>
+            <div class="toggle-divider"></div>
+            <button class="theme-toggle-btn theme-toggle-disabled" disabled tabindex="-1"
+                title="Modo noche deshabilitado temporalmente">
+                <span class="theme-icon" style="opacity:0.5; filter: grayscale(1);">🌙</span>
+            </button>
+        </div>
+    </div>
+
+    <div *ngIf="loading" class="loading">Cargando tareas...</div>
+    <div *ngIf="error" class="error">{{ error }}</div>
+
+    <div *ngIf="!loading && !error">
+        <!-- Grid View -->
+        <div *ngIf="viewMode === 'grid'" class="cards-grid" cdkDropList cdkDropListOrientation="horizontal"
+            (cdkDropListDropped)="onDrop($event)">
+            <div *ngFor="let task of filteredTasks" class="task-card" cdkDrag
+                [class.new-task-glow]="task.id === newlyCreatedTaskId" [ngClass]="{
+               'status-pending': task.status === 'PENDING',
+               'status-done': task.status === 'DONE',
+               'status-in-progress': task.status === 'IN_PROGRESS',
+               'status-expired': isExpired(task) || task.status === 'EXPIRED'
+             }">
+                <!-- Floating Actions (Hidden by default, shown on hover) -->
+                <div class="floating-actions">
+                    <button class="action-btn edit-btn" (click)="$event.stopPropagation(); editTask(task)"
+                        title="Editar">✏️</button>
+                    <button class="action-btn delete-btn" (click)="$event.stopPropagation(); deleteTask(task)"
+                        title="Eliminar">🗑️</button>
+                </div>
+
+                <h3 [attr.title]="task.title">{{ task.title }}</h3>
+
+                <div class="status-priority-row">
+                    <button class="status-btn" [ngClass]="isExpired(task) ? 'EXPIRED' : task.status"
+                        (click)="toggleStatus(task)">
+                        {{ isExpired(task) ? 'EXPIRED' : task.status }}
+                    </button>
+                    <span class="priority-badge" [ngClass]="task.priority">
+                        {{ task.priority }}
+                    </span>
+                </div>
+
+                <!-- Linear Time Progress Bar (Simplified) -->
+                <div class="time-progress-bar-container"
+                    *ngIf="!isExpired(task) && task.status !== 'DONE' && task.dueDate">
+                    <div class="time-info-text" [ngClass]="'text-' + getTimerStatus(task.dueDate)"
+                        *ngIf="getTimerValues(task.dueDate) as values">
+                        <span class="clock-icon">🕒</span>
+                        <span class="countdown-val">{{ values.h }}h {{ values.m }}m {{ values.s }}s</span>
+                    </div>
+                    <div class="linear-progress-track">
+                        <div class="linear-progress-fill" [ngClass]="'bg-' + getTimerStatus(task.dueDate)"
+                            [style.width.%]="getTaskProgress(task)">
+                        </div>
+                    </div>
+                </div>
+
+                <p class="description">{{ task.description || 'Sin descripción' }}</p>
+
+
+            </div>
+        </div>
+
+        <!-- List View (Windows Style) -->
+        <div *ngIf="viewMode === 'list'" class="task-list-view">
+            <div class="list-row list-header">
+                <div class="col-title">Nombre</div>
+                <div class="col-status">Estado</div>
+                <div class="col-priority">Prioridad</div>
+                <div class="col-date">Vencimiento</div>
+                <div class="col-actions">Acciones</div>
+            </div>
+            <div *ngFor="let task of filteredTasks" class="list-row task-item" [ngClass]="task.status.toLowerCase()">
+                <div class="col-title" [attr.title]="task.title">
+                    <span class="task-icon">📄</span>
+                    {{ task.title }}
+                </div>
+                <div class="col-status">
+                    <button class="status-btn mini" [ngClass]="isExpired(task) ? 'EXPIRED' : task.status"
+                        (click)="toggleStatus(task)">
+                        {{ isExpired(task) ? 'EXPIRED' : task.status }}
+                    </button>
+                </div>
+                <div class="col-priority">
+                    <span class="priority-badge mini" [ngClass]="task.priority">{{ task.priority }}</span>
+                </div>
+                <div class="col-date">
+                    {{ task.dueDate ? (task.dueDate | date:'dd/MM/yyyy HH:mm') : '-' }}
+                </div>
+                <div class="col-actions">
+                    <button class="mini-action-btn edit" (click)="editTask(task)">✏️</button>
+                    <button class="mini-action-btn delete" (click)="deleteTask(task)">🗑️</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Timeline View -->
+        <div *ngIf="viewMode === 'timeline'" class="timeline-view">
+            <div *ngFor="let task of timelineTasks; let i = index" class="timeline-item">
+                <div class="timeline-marker">
+                    <div class="marker-dot" [ngClass]="isExpired(task) ? 'EXPIRED' : task.status"></div>
+                    <div class="marker-line" *ngIf="i < timelineTasks.length - 1"></div>
+                </div>
+                <div class="timeline-content">
+                    <div class="timeline-date">{{ task.dueDate | date:'dd MMM, HH:mm' }}</div>
+                    <div class="timeline-task-card"
+                        [ngClass]="isExpired(task) ? 'status-expired' : 'status-' + task.status.toLowerCase().replace('_', '-')">
+                        <div class="timeline-card-header">
+                            <h4 [attr.title]="task.title">{{ task.title }}</h4>
+                            <span class="priority-badge mini" [ngClass]="task.priority">{{ task.priority }}</span>
+                        </div>
+                        <p class="timeline-desc">{{ task.description }}</p>
+                        <div class="timeline-card-footer">
+                            <button class="status-btn mini" [ngClass]="isExpired(task) ? 'EXPIRED' : task.status"
+                                (click)="toggleStatus(task)">
+                                {{ isExpired(task) ? 'EXPIRED' : task.status }}
+                            </button>
+                            <div class="timeline-actions">
+                                <button class="mini-action-btn edit" (click)="editTask(task)">✏️</button>
+                                <button class="mini-action-btn delete" (click)="deleteTask(task)">🗑️</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="timelineTasks.length === 0" class="no-timeline-data">
+                No hay tareas con fecha programada para mostrar en la línea de tiempo.
+            </div>
+        </div>
+
+        <!-- Calendar Week View -->
+        <div *ngIf="viewMode === 'calendar'" class="calendar-week-view">
+            <div class="calendar-week-grid">
+                <div *ngFor="let day of calendarWeek" class="calendar-day">
+                    <div class="calendar-day-header" [class.today]="day.isToday">
+                        <span class="calendar-day-label">{{ day.label }}</span>
+                        <span class="calendar-day-date">{{ day.date | date:'dd/MM' }}</span>
+                    </div>
+                    <div class="calendar-tasks">
+                        <div *ngFor="let task of day.tasks" class="calendar-task-mini"
+                            [ngClass]="task.status.toLowerCase()">
+                            <span class="calendar-task-time">{{ task.dueDate ? (task.dueDate | date:'HH:mm') : '--:--'
+                                }}</span>
+                            <span class="calendar-task-title" [title]="task.title">{{ task.title }}</span>
+                        </div>
+                        <div *ngIf="day.tasks.length === 0" class="calendar-no-tasks">Sin tareas</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div *ngIf="timelineTasks.length === 0" class="no-timeline-data">
+            No hay tareas con fecha programada para mostrar en la línea de tiempo.
+        </div>
+    </div>
+</div>
+
+<div *ngIf="!loading && !error && filteredTasks.length === 0" class="no-data">
+    No hay tareas para este filtro.
+</div>
+
+<!-- Productivity Report Section -->
+<div class="productivity-report" *ngIf="!loading && !error">
+    <div class="report-header">
+        <h3>📊 Reporte de Productividad</h3>
+        <span class="report-subtitle">Tareas finalizadas en los últimos 7 días</span>
+    </div>
+    <div class="stats-grid">
+        <div *ngFor="let stat of weeklyStats" class="stat-card" [ngClass]="{'today': stat.day === 'Hoy'}">
+            <span class="stat-day">{{ stat.day }}</span>
+            <span class="stat-date">{{ stat.date }}</span>
+            <span class="stat-count">{{ stat.count }}</span>
+            <div class="stat-bar-container">
+                <div class="stat-bar" [style.height.%]="stat.count * 10 > 100 ? 100 : stat.count * 10"></div>
+            </div>
+        </div>
+    </div>
+    <div class="report-summary">
+        Hoy has completado <strong>{{ totalCompletedToday }}</strong> tareas. ¡Sigue así! 🚀
+    </div>
+</div>
+
+<!-- Add Task Modal -->
+<div class="modal-overlay" *ngIf="showAddModal" (click)="closeAddModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h3>Crear Nueva Tarea</h3>
+            <button class="close-btn" (click)="closeAddModal()">&times;</button>
+        </div>
+        <form (ngSubmit)="createTask()">
+            <div class="form-group">
+                <label>Título</label>
+                <input type="text" [(ngModel)]="newTask.title" name="title" placeholder="¿Qué hay que hacer?" required>
+            </div>
+            <div class="form-group">
+                <label>Descripción</label>
+                <textarea [(ngModel)]="newTask.description" name="description" rows="3"
+                    placeholder="Añade más detalles..."></textarea>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Prioridad</label>
+                    <select [(ngModel)]="newTask.priority" name="priority">
+                        <option value="LOW">Baja</option>
+                        <option value="MEDIUM">Media</option>
+                        <option value="HIGH">Alta</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Vencimiento</label>
+                    <input type="datetime-local" [(ngModel)]="newTask.dueDate" name="dueDate">
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="cancel-btn" (click)="closeAddModal()">Cancelar</button>
+                <button type="submit" class="save-btn create-btn">Crear Tarea</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Edit Task Modal -->
+<div class="modal-overlay" *ngIf="showEditModal" (click)="closeEditModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h3>Editar Tarea</h3>
+            <button class="close-btn" (click)="closeEditModal()">&times;</button>
+        </div>
+        <form (ngSubmit)="saveTask()">
+            <div class="form-group">
+                <label>Título</label>
+                <input type="text" [(ngModel)]="editedTask.title" name="title" required>
+            </div>
+            <div class="form-group">
+                <label>Descripción</label>
+                <textarea [(ngModel)]="editedTask.description" name="description" rows="3"></textarea>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Prioridad</label>
+                    <select [(ngModel)]="editedTask.priority" name="priority">
+                        <option value="LOW">Baja</option>
+                        <option value="MEDIUM">Media</option>
+                        <option value="HIGH">Alta</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Vencimiento</label>
+                    <input type="datetime-local" [(ngModel)]="editedTask.dueDate" name="dueDate">
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="cancel-btn" (click)="closeEditModal()">Cancelar</button>
+                <button type="submit" class="save-btn">Guardar Cambios</button>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- Delete Confirmation Modal -->
+<div class="modal-overlay" *ngIf="showDeleteModal" (click)="closeDeleteModal()">
+    <div class="modal-content delete-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h3>Eliminar Tarea</h3>
+            <button class="close-btn" (click)="closeDeleteModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p>¿Estás seguro de que deseas eliminar la tarea <strong>"{{ taskToDelete?.title }}"</strong>?</p>
+            <p class="warning-text">Esta acción no se puede deshacer.</p>
+        </div>
+        <div class="modal-actions">
+            <button type="button" class="cancel-btn" (click)="closeDeleteModal()">Cancelar</button>
+            <button type="button" class="confirm-delete-btn" (click)="confirmDelete()">Eliminar Tarea</button>
+        </div>
+    </div>
+    <!-- Floating Action Button -->
+    <button class="fab-btn" (click)="openAddModal()" title="Nueva Tarea">
+        <span class="fab-plus">+</span>
+    </button>
+</div>

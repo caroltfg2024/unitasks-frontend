@@ -1,0 +1,83 @@
+<div class="leaderboard-container" [class.dark-mode]="themeService.isDarkMode()">
+    <div class="header">
+        <button class="back-btn" (click)="goToDashboard()">
+            ← Volver al Dashboard
+        </button>
+        <h1 class="title">
+            <span class="trophy-icon">🏆</span>
+            Clasificación UniTasks
+        </h1>
+        <p class="subtitle">Compite con tus compañeros y alcanza el primer puesto</p>
+    </div>
+
+    <div class="loading" *ngIf="loading">
+        <div class="spinner"></div>
+        <p>Cargando clasificación...</p>
+    </div>
+
+    <div class="error" *ngIf="error && !loading">
+        <span class="error-icon">⚠️</span>
+        <div>{{ error }}</div>
+        <button class="retry-btn" (click)="loadLeaderboard()">
+            Reintentar
+        </button>
+    </div>
+
+    <div class="leaderboard-table" *ngIf="!loading && !error">
+        <div class="table-header">
+            <div class="pos-col">Pos</div>
+            <div class="user-col">Usuario</div>
+            <div class="stats-col">T</div>
+            <div class="stats-col">Pendientes</div>
+            <div class="stats-col">En Progreso</div>
+            <div class="stats-col">Completadas</div>
+            <div class="stats-col">Expiradas</div>
+            <div class="points-col">Puntos</div>
+        </div>
+
+        <div class="table-body">
+            <div *ngFor="let entry of leaderboard; let i = index" class="table-row"
+                [class.current-user]="isCurrentUser(entry)" [class.podium]="i < 3">
+                <div class="pos-col">
+                    <span class="position">{{ i + 1 }}</span>
+                    <span class="medal" *ngIf="i < 3">{{ getMedalEmoji(i + 1) }}</span>
+                </div>
+                <div class="user-col">
+                    <div class="user-info">
+                        <span class="user-avatar">👤</span>
+                        <div class="user-details">
+                            <span class="user-name">{{ entry.name }} {{ entry.lastname }}</span>
+                            <span class="user-email" *ngIf="isCurrentUser(entry)">
+                                (Tú) <span class="badge">✨</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="stats-col total">{{ entry.totalTasks }}</div>
+                <div class="stats-col pending">
+                    <span class="badge-pending">{{ entry.pendingTasks }}</span>
+                </div>
+                <div class="stats-col in-progress">
+                    <span class="badge-in-progress">{{ entry.inProgressTasks }}</span>
+                </div>
+                <div class="stats-col done">
+                    <span class="badge-done">{{ entry.doneTasks }}</span>
+                </div>
+                <div class="stats-col expired">
+                    <span class="badge-expired">{{ entry.expiredTasks }}</span>
+                </div>
+                <div class="points-col">
+                    <span class="points-badge">{{ entry.points }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-info" *ngIf="!loading && !error">
+        <div class="info-card">
+            <span class="info-icon">💡</span>
+            <p><strong>¿Cómo funcionan los puntos?</strong></p>
+            <p>Cada tarea completada (DONE) = 1 punto. ¡Completa más tareas para subir en el ranking!</p>
+        </div>
+    </div>
+</div>

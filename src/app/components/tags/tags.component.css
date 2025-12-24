@@ -1,0 +1,89 @@
+.tags-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0 0.5rem;
+    align-items: stretch;
+}
+
+.tag-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0.85rem;
+    color: #475569;
+    /* Slate-600 */
+    font-weight: 500;
+    font-size: 0.825rem;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    border-radius: 12px;
+    background: transparent;
+    border: none;
+}
+
+.tag-label-group {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.tag-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.1);
+}
+
+.tag-item:hover {
+    background: #f1f5f9;
+    /* Slate-100 */
+    color: #0f172a;
+    /* Slate-900 */
+    transform: translateX(4px);
+}
+
+.tag-count {
+    background: #f1f5f9;
+    color: #64748b;
+    padding: 0.15rem 0.6rem;
+    border-radius: 8px;
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+
+.tag-divider {
+    margin: 1.25rem 0 0.5rem 0;
+    padding: 0 1rem;
+    width: 100%;
+}
+
+.tag-divider span {
+    color: #94a3b8;
+    /* Slate-400 */
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+}
+
+/* Active State Helper */
+.tag-item.active {
+    background: #eef2ff !important;
+    color: #4338ca;
+    /* Indigo-700 for better readability */
+    font-weight: 700;
+}
+
+.tag-item.active .tag-dot {
+    box-shadow: 0 0 12px currentColor;
+    transform: scale(1.1);
+}
+
+.tag-item.active .tag-count {
+    background: #e0e7ff;
+    /* Indigo-100 */
+    color: #4338ca;
+    /* Indigo-700 */
+}
