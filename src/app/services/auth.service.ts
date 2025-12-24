@@ -8,7 +8,8 @@ import { Router } from '@angular/router';
     providedIn: 'root'
 })
 export class AuthService {
-    private apiUrl = 'http://localhost:8080/api/auth';
+    // private apiUrl = 'http://localhost:8080/api/auth';
+    private apiUrl = 'https://unitasks-backend.onrender.com/api/auth';
     private tokenKey = 'unitasks_token';
     private userKey = 'unitasks_user';
 
