@@ -5,7 +5,8 @@ import { HttpClient } from '@angular/common/http';
     providedIn: 'root'
 })
 export class HelloService {
-    private apiUrl = 'http://localhost:8080/api/hello';
+    // private apiUrl = 'http://localhost:8080/api/hello';
+    private apiUrl = 'https://unitasks-backend.onrender.com/api/hello';
 
     constructor(private http: HttpClient) { }
 

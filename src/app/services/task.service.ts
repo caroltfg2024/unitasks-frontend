@@ -7,7 +7,8 @@ import { Task } from '../models/task.model';
     providedIn: 'root'
 })
 export class TaskService {
-    private apiUrl = 'http://localhost:8080/api/tasks';
+    // private apiUrl = 'http://localhost:8080/api/tasks';
+    private apiUrl = 'https://unitasks-backend.onrender.com/api/tasks';
     private tasksSubject = new BehaviorSubject<Task[]>([]);
     tasks$ = this.tasksSubject.asObservable();
 
